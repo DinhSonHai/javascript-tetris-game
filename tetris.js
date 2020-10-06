@@ -3,12 +3,6 @@ const context = canvas.getContext('2d');
 
 context.scale(20, 20);
 
-const matrix = [
-  [0, 0, 0],
-  [1, 1, 1],
-  [0, 1, 0],
-];
-
 function collide(arena, player) {
   const [m, o] = [player.matrix, player.pos];
   for (let y = 0; y < m.length; y++) {
@@ -27,6 +21,60 @@ function createMatrix(w, h) {
     matrix.push(new Array(w).fill(0));
   }
   return matrix;
+}
+
+function createBlock(type) {
+  switch (type) {
+    case 'T':
+      return [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 1, 0],
+      ];
+    case 'O':
+      return [
+        [1, 1],
+        [1, 1],
+      ];
+    case 'L':
+      return [
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 1],
+      ];
+    case 'J':
+      return [
+        [0, 1, 0],
+        [0, 1, 0],
+        [1, 1, 0],
+      ];
+    case 'I':
+      return [
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+      ];
+    case 'S':
+      return [
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0],
+      ];
+    case 'Z':
+      return [
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0],
+      ];
+  }
+}
+
+function playerReset() {
+  const blocks = 'ILJOTSZ';
+  player.matrix = createBlock(blocks[(blocks.length * Math.random()) | 0]);
+  player.pos.y = 0;
+  player.pos.x = ((arena[0].length / 2) | 0) - ((player.matrix.length / 2) | 0);
 }
 
 function draw() {
@@ -70,7 +118,7 @@ function playerDrop() {
   if (collide(arena, player)) {
     player.pos.y--;
     merge(arena, player);
-    player.pos.y = 0;
+    playerReset();
   }
   dropCounter = 0;
 }
@@ -124,7 +172,7 @@ console.table(arena);
 
 const player = {
   pos: { x: 5, y: 5 },
-  matrix: matrix,
+  matrix: createBlock('T'),
 };
 
 document.addEventListener('keydown', (e) => {
